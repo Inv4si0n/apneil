@@ -6,18 +6,13 @@
     android:layout_height="match_parent"
     tools:context="charl_kakashi.fr.apneil.MainActivity">
 
-     <com.jjoe64.graphview.GraphView
-        android:id="@+id/graph"
-        android:layout_width="match_parent"
-        android:layout_height="200dip"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="266dp" />
 
-     <button
+     <com.jjoe64.graphview.GraphView
+         android:id="@+id/graph"
          android:layout_width="match_parent"
-         android:layout_height="26dp"
-         tools:layout_editor_absoluteX="0dp"
-         tools:layout_editor_absoluteY="0dp"
-         android:text="@string/Graphique"/>
+         android:layout_height="250dip" />
+
+
+
 
 </android.support.constraint.ConstraintLayout>
