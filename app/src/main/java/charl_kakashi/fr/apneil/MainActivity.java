@@ -48,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
 
         graph.addSeries(series);
 
-        Button button = findViewById(R.id.on);
-        Button buttona = findViewById(R.id.off);
     }
 
 
