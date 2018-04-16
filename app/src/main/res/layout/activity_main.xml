@@ -21,38 +21,32 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <Button
-        android:id="@+id/on"
+        android:id="@+id/connect"
         android:layout_width="368dp"
         android:layout_height="40dp"
-        android:layout_marginBottom="220dp"
-        android:text="ON"
+        android:layout_marginBottom="172dp"
+        android:text="Se connecter à un appareil"
         app:layout_constraintBottom_toTopOf="@+id/graph"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/off"
+        android:id="@+id/disconnect"
         android:layout_width="368dp"
         android:layout_height="40dp"
-        android:layout_marginBottom="148dp"
-        android:layout_marginEnd="8dp"
-        android:text="OFF"
-        app:layout_constraintBottom_toTopOf="@+id/graph"
-        app:layout_constraintEnd_toEndOf="@+id/on"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/on" />
-
-    <Button
-        android:id="@+id/dis"
-        android:layout_width="368dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="104dp"
         android:layout_marginEnd="8dp"
         android:text="Déconnexion"
         app:layout_constraintBottom_toTopOf="@+id/graph"
-        app:layout_constraintEnd_toEndOf="@+id/off"
+        app:layout_constraintEnd_toEndOf="@+id/connect"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/off" />
+        app:layout_constraintStart_toStartOf="@+id/connect" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView"/>
+
 
 
 </android.support.constraint.ConstraintLayout>
