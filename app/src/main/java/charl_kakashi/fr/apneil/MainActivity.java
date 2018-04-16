@@ -26,23 +26,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-     // Connexion bluetooth
+        // Connexion bluetooth
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null)
-            Toast.makeText(MainActivity.this, "Pas de Bluetooth",
+            Toast.makeText(MainActivity.this, "Votre appareil ne possède pas le bluetooth",
+                    Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(MainActivity.this, "Bluetooth présent sur votre appareil",
                     Toast.LENGTH_SHORT).show();
 
-        else
-            Toast.makeText(MainActivity.this, "Avec Bluetooth",
-                    Toast.LENGTH_SHORT).show();
 
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableBlueTooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBlueTooth, REQUEST_CODE_ENABLE_BLUETOOTH);
         }
 
-     // Graphique
+        // Graphique
 
         GraphView graph = findViewById(R.id.graph);
 
