@@ -3,6 +3,7 @@ package charl_kakashi.fr.apneil;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
@@ -38,8 +40,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public static BluetoothAdapter bluetoothAdapter;
     private ListView listView;
-    private ArrayList<String> mDeviceList = new ArrayList<String>();
+    private ArrayList<String> mDeviceList = new ArrayList<>();
 
+    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private static MainActivity instance;
 
@@ -54,38 +57,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         instance = this;
 
-
-
-        listView = findViewById(R.id.listView);
+/*        listView = findViewById(R.id.listView);
 
         listView.setClickable(true);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                try {
+                    String selectedItem = listView.getItemAtPosition(position).toString();
 
-                String selectedItem = listView.getItemAtPosition(position).toString();
+                    String address = selectedItem.split("\n")[1];
 
-                String address = selectedItem.split("\n")[1];
+                    Toast.makeText(MainActivity.this, "Appareil address : " + address,
+                            Toast.LENGTH_SHORT).show();
 
-                Toast.makeText(MainActivity.this, "Appareil address : " + address,
-                        Toast.LENGTH_SHORT).show();
-
-                devices = bluetoothAdapter.getBondedDevices();
-                for (BluetoothDevice device : devices) {
-                    if (device.getAddress().equals(address)) {
+                    devices = bluetoothAdapter.getBondedDevices();
+                    for (BluetoothDevice device : devices) {
+                        if (device.getAddress().equals(address)) {
 
 
-
-                        boolean connect = new ConnectThread().connect(device, device.getUuids()[0].getUuid());
-                        Toast.makeText(MainActivity.this, "State: " + connect,
-                                Toast.LENGTH_SHORT).show();
+                            boolean connect = new ConnectThread().connect(device, myUUID);
+                            Toast.makeText(MainActivity.this, "State: " + connect,
+                                    Toast.LENGTH_SHORT).show();
+                        }
                     }
+
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
 
 
             }
-        });
+        });*/
 
 
         btnConnect = findViewById(R.id.connect);
@@ -127,6 +131,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         graph.addSeries(series);
 
+    }
+
+
+    String address = null, name = null;
+    BluetoothSocket btSocket = null;
+    Set<BluetoothDevice> pairedDevices;
+
+    private void bluetooth_connect_device() throws IOException {
+        try {
+            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            address = bluetoothAdapter.getAddress();
+            pairedDevices = bluetoothAdapter.getBondedDevices();
+            if (pairedDevices.size() > 0) {
+                for (BluetoothDevice bt : pairedDevices) {
+                    address = bt.getAddress().toString();
+                    name = bt.getName().toString();
+                    Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+
+        } catch (Exception we) {
+            Toast.makeText(MainActivity.this, "1: " + we.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+        }
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();//get the mobile bluetooth device
+        BluetoothDevice dispositivo = bluetoothAdapter.getRemoteDevice(address);//connects to the device's address and checks if it's available
+        btSocket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);//create a RFCOMM (SPP) connection
+        btSocket.connect();
+        try {
+            Toast.makeText(MainActivity.this, "BT Name: " + name + "\nBT Address: " + address,
+                    Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(MainActivity.this, "2: " + e.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -211,36 +251,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @SuppressLint("WrongConstant")
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-
-            case R.id.connect:
-            /*    Toast toast = Toast.makeText(MainActivity.this, "Ouverture des périphériques....",
-                        Toast.LENGTH_LONG);
-                toast.setDuration(300);
-                toast.show();*/
-
-                devices = bluetoothAdapter.getBondedDevices();
-                for (BluetoothDevice device : devices) {
-//                    Toast.makeText(MainActivity.this, "Device = " + blueDevice.getName(), Toast.LENGTH_SHORT).show();
 
 
-                    mDeviceList.add(device.getName() + "\n" + device.getAddress());
-                    Log.i("BT", device.getName() + "\n" + device.getAddress());
-                    listView.setAdapter(new ArrayAdapter<>(this,
-                            android.R.layout.simple_list_item_1, mDeviceList));
-                }
+        try {
 
-                break;
 
-            case R.id.disconnect:
-                Toast toast2 = Toast.makeText(MainActivity.this, "Déconnexion",
-                        Toast.LENGTH_SHORT);
-                toast2.setDuration(300);
-                toast2.show();
-                break;
+            switch (v.getId()) {
 
-            default:
-                break;
+                case R.id.connect:
+
+                    try {
+                        bluetooth_connect_device();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    break;
+
+                case R.id.disconnect:
+
+                    Toast toast2 = Toast.makeText(MainActivity.this, "Déconnexion",
+                            Toast.LENGTH_SHORT);
+                    toast2.show();
+
+                    bluetoothAdapter.cancelDiscovery();
+
+                    break;
+
+                default:
+                    break;
+            }
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
