@@ -29,7 +29,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener
+{
 
     private static final int REQUEST_CODE_ENABLE_BLUETOOTH = 0;
     private final Handler handler = new Handler();
@@ -46,12 +47,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static MainActivity instance;
 
-    public static MainActivity getInstance() {
+    public static MainActivity getInstance()
+    {
         return instance;
     }
 
+
+    private static int x = 3;
+    private static int y = 0;
+    private static int maxValues = 6;
+
+
+    Random rand = new Random();
+
+
+    private static GraphView graph;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -91,43 +105,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });*/
 
+        // Connect BTN
+//        btnConnect = findViewById(R.id.connect);
+//        btnConnect.setOnClickListener(this);
 
-        btnConnect = findViewById(R.id.connect);
-        btnDisconnect = findViewById(R.id.disconnect);
-
-        btnConnect.setOnClickListener(this);
-        btnDisconnect.setOnClickListener(this);
+        // Disconnect BTN
+//        btnDisconnect = findViewById(R.id.disconnect);
+//        btnDisconnect.setOnClickListener(this);
 
 
         // Connexion bluetooth
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+//        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        if (bluetoothAdapter == null)
-            Toast.makeText(MainActivity.this, "Votre appareil ne possède pas le bluetooth",
-                    Toast.LENGTH_SHORT).show();
-        else
-            Toast.makeText(MainActivity.this, "Bluetooth présent sur votre appareil",
-                    Toast.LENGTH_SHORT).show();
-
-
-        if (!bluetoothAdapter.isEnabled()) {
-            Intent bluetoothReceiver = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(bluetoothReceiver, REQUEST_CODE_ENABLE_BLUETOOTH);
-        }
+//        if (bluetoothAdapter == null)
+//            Toast.makeText(MainActivity.this, "Votre appareil ne possède pas le bluetooth",
+//                           Toast.LENGTH_SHORT).show();
+//        else
+//            Toast.makeText(MainActivity.this, "Bluetooth présent sur votre appareil",
+//                           Toast.LENGTH_SHORT).show();
+//
+//        System.out.println(bluetoothAdapter.getName());
+//
+//        if (!bluetoothAdapter.isEnabled()) {
+//            Intent bluetoothReceiver = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//            startActivityForResult(bluetoothReceiver, REQUEST_CODE_ENABLE_BLUETOOTH);
+//        }
 
         // Graphique
 
-        GraphView graph = findViewById(R.id.graph);
+        graph = findViewById(R.id.graph);
 
         graph.setTitle("Apnée par nuit"); // Titre du graph
         graph.setTitleColor(Color.BLUE); // Couleur du titre du graph
 
-        series = new LineGraphSeries<>(generateData());
+        series = new LineGraphSeries<>();
 
         series.setColor(Color.RED); // Couleur de la courbe
         series.setDrawDataPoints(true); // Tracé les points
         series.setDataPointsRadius(10); // Radius points
         series.setThickness(2); // Epaisseur
+
+        series.appendData(new DataPoint(x, y), false, maxValues);
 
         graph.addSeries(series);
 
@@ -138,7 +156,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     BluetoothSocket btSocket = null;
     Set<BluetoothDevice> pairedDevices;
 
-    private void bluetooth_connect_device() throws IOException {
+    private void bluetooth_connect_device() throws IOException
+    {
         try {
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             address = bluetoothAdapter.getAddress();
@@ -154,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         } catch (Exception we) {
             Toast.makeText(MainActivity.this, "1: " + we.getMessage(),
-                    Toast.LENGTH_SHORT).show();
+                           Toast.LENGTH_SHORT).show();
         }
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();//get the mobile bluetooth device
         BluetoothDevice dispositivo = bluetoothAdapter.getRemoteDevice(address);//connects to the device's address and checks if it's available
@@ -162,48 +181,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btSocket.connect();
         try {
             Toast.makeText(MainActivity.this, "BT Name: " + name + "\nBT Address: " + address,
-                    Toast.LENGTH_SHORT).show();
+                           Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Toast.makeText(MainActivity.this, "2: " + e.getMessage(),
-                    Toast.LENGTH_SHORT).show();
+                           Toast.LENGTH_SHORT).show();
         }
     }
 
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
-        timer = new Runnable() {
+        timer = new Runnable()
+        {
             @Override
-            public void run() {
-                series.resetData(generateData());
-                handler.postDelayed(this, 1500);
+            public void run()
+            {
+//                series.resetData(generateData());
+                series.appendData(new DataPoint(++x, rand.nextInt()), false, maxValues);
+                handler.postDelayed(this, 1000);
             }
         };
-        handler.postDelayed(timer, 1500);
+        handler.postDelayed(timer, 500);
 
     }
 
     @Override
-    public void onPause() {
+    public void onPause()
+    {
         handler.removeCallbacks(timer);
         super.onPause();
     }
 
-    Random rand = new Random();
-
-    private DataPoint[] generateData() {
-        int count = 30;
-        DataPoint[] values = new DataPoint[count];
-        for (int i = 0; i < count; i++) {
-            double x = i;
-            double f = rand.nextDouble() * 0.15 + 0.3;
-            double y = rand.nextInt();
-            DataPoint v = new DataPoint(x, y);
-            values[i] = v;
-        }
-        return values;
-    }
 
     private Set<BluetoothDevice> devices;
 
@@ -226,8 +236,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }*/
 
 
-    private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
+    private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver()
+    {
+        public void onReceive(Context context, Intent intent)
+        {
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent
@@ -235,13 +247,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mDeviceList.add(device.getName() + "\n" + device.getAddress());
                 Log.i("BT", device.getName() + "\n" + device.getAddress());
                 listView.setAdapter(new ArrayAdapter<>(context,
-                        android.R.layout.simple_list_item_1, mDeviceList));
+                                                       android.R.layout.simple_list_item_1, mDeviceList));
             }
         }
     };
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         super.onDestroy();
         bluetoothAdapter.cancelDiscovery();
         unregisterReceiver(bluetoothReceiver);
@@ -250,7 +263,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @SuppressLint("WrongConstant")
     @Override
-    public void onClick(View v) {
+    public void onClick(View v)
+    {
 
 
         try {
@@ -271,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case R.id.disconnect:
 
                     Toast toast2 = Toast.makeText(MainActivity.this, "Déconnexion",
-                            Toast.LENGTH_SHORT);
+                                                  Toast.LENGTH_SHORT);
                     toast2.show();
 
                     bluetoothAdapter.cancelDiscovery();
